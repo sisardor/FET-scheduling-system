@@ -65,6 +65,127 @@ app.controller("AppController", function( $scope, myHttp ) {
 	$scope.getStudents();
 });
 //////////////////////////////
+//		TIME constraint		//
+//////////////////////////////
+app.controller('TimeConsCTRL', function( $scope, myHttp ) {
+	console.log("TimeConsCTRL");
+	$scope.activities = [];
+	$scope.chosenActivities = [];
+	$scope.btn1 = 'Save';
+	$scope.btn2 = 'Delete';
+	$scope.btn3 = 'Cancel';
+	
+	$scope.getActivities = function () {
+        myHttp.query({
+            'query': 'activities',
+            'method': 'get-all'
+        }).success(function (data) {
+            $scope.activities = data;
+			$scope.activity = $scope.activities[0];
+        });
+    }
+
+    $scope.getCons = function () {
+        myHttp.query({
+            'query': 'space_constraints',
+            'method': 'get-all'
+        }).success(function (data) {
+            $scope.constraints = data;
+        });
+    }
+    $scope.cancel = function () {
+    	$scope.btn1 = 'Save';
+    	$scope.checked = false;
+        $scope.clearChosen();
+    }
+
+
+    $scope.editCons = function(id) {
+    	console.log(id);
+    	$scope.btn1 = 'Update';
+    	$scope.checked = true;
+    	$scope.tmp_id = id;
+    	
+    	myHttp.query({
+            'query': 'activities_same_start',
+            'method': 'get-all',
+            'id':id
+        }).success(function(data) {
+            $scope.chosenActivities = data;
+            $scope.chosenAct = $scope.chosenActivities[0];
+        });
+    }
+	
+	
+	$scope.removeFromChosen = function(data) {
+		console.log(data);
+
+		for (var i = $scope.chosenActivities.length - 1; i >= 0; i--) {
+			if($scope.chosenActivities[i] == data) {
+				$scope.chosenActivities.splice($scope.chosenActivities.indexOf(data),1);
+				$scope.chosenAct = $scope.chosenActivities[0];
+				return;
+			}
+		}
+	}
+	$scope.clearChosen = function() {
+		$scope.chosenActivities = [];
+	}
+
+	$scope.destroy = function() {
+		myHttp.query({
+	            'query': 'space_constraints',
+	            'method': 'delete',
+	            'id': $scope.tmp_id 
+	        }).success(function(data) {
+	            $scope.getCons();
+	            $scope.cancel();
+	        });
+	    $scope.tmp_id ='';
+	}
+
+	$scope.saveChosen = function() {
+		console.log($scope.chosenActivities);
+		if($scope.btn1 == 'Update') {
+			myHttp.query({
+	            'query': 'space_constraints',
+	            'method': 'update',
+	            'data':$scope.chosenActivities,
+	            'id': $scope.tmp_id 
+	        }).success(function(data) {
+	            $scope.getCons();
+	            $scope.cancel();
+	        });
+	        $scope.tmp_id ='';
+
+		} else {
+
+			myHttp.query({
+	            'query': 'space_constraints',
+	            'method': 'new',
+	            'data':$scope.chosenActivities
+	        }).success(function (data) {
+	            
+	            $scope.getCons();
+	        });
+    	}
+	}
+	
+	$scope.addToChosen = function(data) {
+		console.log(data);
+
+		for (var i = $scope.chosenActivities.length - 1; i >= 0; i--) {
+			if($scope.chosenActivities[i] == data) {
+				return;
+			}
+		}
+		$scope.chosenActivities.push(data);
+		$scope.chosenAct = $scope.chosenActivities[0];
+	}
+	$scope.getActivities();
+	$scope.getCons();
+});
+//////////////////////////////
 //		TeachersCtrl		//
 //////////////////////////////
 app.controller('TeachersCtrl', function( $scope, myHttp ) {

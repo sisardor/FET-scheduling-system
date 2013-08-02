@@ -94,7 +94,7 @@ function queryAll($mysqli)
                 $result->free();
             }
         } else if ($_GET['query'] == 'activities') {
-			$sql = 'SELECT activities_id, teach_name, activities.teacher_id,activities.student_id, subj_name, year_name, user_tables.user_table_id '.
+			$sql = 'SELECT activities_id, teach_name, activities.teacher_id,activities.student_id, subj_name, activities.subj_id, year_name, user_tables.user_table_id '.
 			'FROM teachers, subjects, students,activities, user_tables '.
 			'WHERE activities.teacher_id = teachers.teacher_id '.
 			'AND activities.subj_id = subjects.subj_id '.
@@ -108,15 +108,58 @@ function queryAll($mysqli)
 					$row_array['teacher_id']   = $row['teacher_id'];
 					$row_array['student_id']   = $row['student_id'];
                     $row_array['subj_name'] = $row['subj_name'];
+                    $row_array['subj_id'] = $row['subj_id'];
 					$row_array['year_name'] = $row['year_name'];
                     array_push($return_arr, $row_array);
                 }
                 /* free result set */
                 $result->free();
             }
-			
-			
-		}
+		} else if ($_GET['query'] == 'space_constraints') {
+            $sql = 'SELECT same_start_cons_id, weight_percentage, num_of_activities,active ' . 
+            'FROM same_start_hr_constraints ' . 
+            'WHERE user_table_id = ' . $user_table_id;
+
+            if ($result = $mysqli->query($sql)) {
+                while ($row = $result->fetch_assoc()) {
+                    $row_array['id']   = $row['same_start_cons_id'];
+                    $row_array['weight'] = $row['weight_percentage'];
+                    $row_array['num'] = $row['num_of_activities'];
+                    $row_array['active'] = $row['active'];
+                    array_push($return_arr, $row_array);
+                }
+                /* free result set */
+                $result->free();
+            }
+        } 
+        else if ($_GET['query'] == 'activities_same_start') {
+            $id = $_GET['id'];
+            $sql = 'SELECT activities_id, teach_name, activities.teacher_id,activities.student_id, subj_name, activities.subj_id, year_name '.
+            'FROM teachers, subjects, students,activities '.
+            'WHERE activities.teacher_id = teachers.teacher_id '.
+            'AND activities.subj_id = subjects.subj_id ' . 
+            'AND activities.student_id = students.student_id '. 
+            'AND activities.activities_id IN ('.
+                'SELECT activities_id '.
+                'FROM activities_same_start, same_start_hr_constraints '.
+                'WHERE same_start_hr_constraints.same_start_cons_id = activities_same_start.same_start_cons_id '.
+                'AND same_start_hr_constraints.same_start_cons_id = '. $id .')';
+
+           if ($result = $mysqli->query($sql)) {
+                while ($row = $result->fetch_assoc()) {
+                    $row_array['id']   = $row['activities_id'];
+                    $row_array['teach_name']   = $row['teach_name'];
+                    $row_array['teacher_id']   = $row['teacher_id'];
+                    $row_array['student_id']   = $row['student_id'];
+                    $row_array['subj_name'] = $row['subj_name'];
+                    $row_array['subj_id'] = $row['subj_id'];
+                    $row_array['year_name'] = $row['year_name'];
+                    array_push($return_arr, $row_array);
+                }
+                /* free result set */
+                $result->free();
+            }
+        }
         return json_encode($return_arr);
     }
 }
@@ -167,7 +210,39 @@ function updateRow($mysqli, $id) {
         $stmt->bind_param("ssss", $teacher_id, $subj_id, $student_id, $id);
         $stmt->execute();
     }
+    else if ($_GET['query'] == 'space_constraints') {
+
+        $mysqli->query("DELETE FROM activities_same_start WHERE same_start_cons_id = $id");
+        $i = $mysqli->affected_rows;
+        if ($i) {
+            $data = json_decode($_GET['data']);
+            $num = count($data);
+
+            $stmt = $mysqli->prepare("UPDATE  same_start_hr_constraints SET  num_of_activities =  ? WHERE  same_start_cons_id = ?");
+            $stmt->bind_param("ss", $num, $id);
+            $stmt->execute();
+            $nrows = $stmt->affected_rows;
     
+            if ($nrows) {
+
+                foreach ($data as $d) {
+
+                    $stmt = $mysqli->prepare('INSERT INTO activities_same_start (same_start_cons_id, activities_id) VALUES (?, ?)');
+                    $stmt->bind_param("ss", $id, $d->id);
+                    $stmt->execute();
+                    $xx = $mysqli->insert_id;
+
+                    if (!$xx) {
+                        return "error";
+                    }
+                   
+                }
+                return '{"success":"updated"}';
+            }
+
+            return '{"error":[{"message":"Not deleted"}]}';
+        }
+    }
     $nrows = $stmt->affected_rows;
     
     if (!$nrows) {
@@ -179,7 +254,6 @@ function updateRow($mysqli, $id) {
 
 function createNew($mysqli)
 {
-
     $name          = $_GET['name'];
     $user_table_id = $_SESSION['user']['user_table_id'];
     $user_id       = $_SESSION['user']['username'];
@@ -223,6 +297,42 @@ function createNew($mysqli)
 		$stmt      = $mysqli->prepare('INSERT INTO `activities` (`activities_id`, `duration`, `total_duration`, `active`, `teacher_id`, `subj_id`, `student_id`, `user_table_id`, `activity_group_id`) VALUES (NULL, 21, 12, "true", ?, ?, ?, ?, NULL);');
 		$stmt->bind_param("iiii",$teacher_id, $subj_id, $student_id,$user_table_id);
 		$stmt->execute();
+    } else if ($_GET['query'] == 'space_constraints') {
+        $data = json_decode($_GET['data']);
+        $weight_percentage = '100';
+        $trueFalse = 'true';
+        $str = '';
+        $num = count($data);
+        //return "$weight_percentage, $num, $trueFalse, $user_table_id";
+
+        $stmt = $mysqli->prepare('INSERT INTO same_start_hr_constraints (weight_percentage, num_of_activities, active, comments, user_table_id) VALUES (?, ?, ?, NULL, ?)');
+        $stmt->bind_param("ssss", $weight_percentage, $num, $trueFalse, $user_table_id);
+
+        $stmt->execute();
+
+
+        $nrows = $mysqli->insert_id;
+        // if (!$nrows) {
+        //     return '{"error":[{"message":"Not inserted"}]}';
+        // }
+        // return $nrows;
+
+        $str='';
+        foreach ($data as $d) {
+
+            $stmt = $mysqli->prepare('INSERT INTO activities_same_start (same_start_cons_id, activities_id) VALUES (?, ?)');
+            $stmt->bind_param("ss", $nrows, $d->id);
+            $stmt->execute();
+            $xx = $mysqli->insert_id;
+            if (!$xx) {
+                return "error";
+            }
+           
+        }
+
+        return '{"success":"true"}';
+
+        
     }
     
     $nrows = $mysqli->insert_id;
@@ -250,6 +360,9 @@ function destroyRow($mysqli, $id)
         $mysqli->query("DELETE FROM buildings WHERE building_id = $id");
     } else if ($_GET['query'] == 'activities') {
         $mysqli->query("DELETE FROM activities WHERE activities_id = $id");
+    } else if ($_GET['query'] == 'space_constraints') {
+        $mysqli->query("DELETE FROM activities_same_start WHERE same_start_cons_id = $id");
+        $mysqli->query("DELETE FROM same_start_hr_constraints WHERE same_start_cons_id = $id");
     }
     
     $i = $mysqli->affected_rows;
