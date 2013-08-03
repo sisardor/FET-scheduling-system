@@ -94,7 +94,7 @@ function queryAll($mysqli)
                 $result->free();
             }
         } else if ($_GET['query'] == 'activities') {
-			$sql = 'SELECT activities_id, teach_name, activities.teacher_id,activities.student_id, subj_name, activities.subj_id, year_name, user_tables.user_table_id '.
+			$sql = 'SELECT activities_id, duration,total_duration,activities.comments, teach_name, activities.teacher_id,activities.student_id, subj_name, activities.subj_id, year_name, user_tables.user_table_id '.
 			'FROM teachers, subjects, students,activities, user_tables '.
 			'WHERE activities.teacher_id = teachers.teacher_id '.
 			'AND activities.subj_id = subjects.subj_id '.
@@ -110,6 +110,9 @@ function queryAll($mysqli)
                     $row_array['subj_name'] = $row['subj_name'];
                     $row_array['subj_id'] = $row['subj_id'];
 					$row_array['year_name'] = $row['year_name'];
+                    $row_array['duration'] = $row['duration'];
+                    $row_array['comment'] = $row['comments'];
+                    $row_array['total_duration'] = $row['total_duration'];
                     array_push($return_arr, $row_array);
                 }
                 /* free result set */
@@ -160,6 +163,14 @@ function queryAll($mysqli)
                 $result->free();
             }
         }
+        else if ($_GET['query'] == 'basic') {
+            $table = $_GET['table'];
+
+            $result = $mysqli->query("SELECT COUNT(*) FROM $table WHERE user_table_id = $user_table_id");
+            $row = $result->fetch_row();
+            return $row[0];
+
+        }
         return json_encode($return_arr);
     }
 }
@@ -204,11 +215,16 @@ function updateRow($mysqli, $id) {
 		$teacher_id = $data[0][0]->id;
 		$student_id = $data[1][0]->id;
 		$subj_id = $data[2]->id;
+        $duration = $data[3]; $total_duration = $data[3];
+        $comment = $data[4];
+
 		$id = $_GET['id'];
+
 		
-        $stmt = $mysqli->prepare("UPDATE  activities SET  teacher_id =  ?,subj_id =  ?,student_id =  ? WHERE  activities.activities_id = ?");
-        $stmt->bind_param("ssss", $teacher_id, $subj_id, $student_id, $id);
+        $stmt = $mysqli->prepare("UPDATE  activities SET  teacher_id =  ?,subj_id =  ?,student_id =  ?, duration = ?, total_duration = ?, comments = ? WHERE  activities.activities_id = ?");
+        $stmt->bind_param("iiiiisi", $teacher_id, $subj_id, $student_id, $duration,$total_duration,$comment, $id);
         $stmt->execute();
+        $nrows = $stmt->affected_rows;
     }
     else if ($_GET['query'] == 'space_constraints') {
 
@@ -217,9 +233,10 @@ function updateRow($mysqli, $id) {
         if ($i) {
             $data = json_decode($_GET['data']);
             $num = count($data);
+            $weight_percentage = $_GET['weight'];
 
-            $stmt = $mysqli->prepare("UPDATE  same_start_hr_constraints SET  num_of_activities =  ? WHERE  same_start_cons_id = ?");
-            $stmt->bind_param("ss", $num, $id);
+            $stmt = $mysqli->prepare("UPDATE  same_start_hr_constraints SET  num_of_activities =  ?, weight_percentage = ? WHERE  same_start_cons_id = ?");
+            $stmt->bind_param("sss", $num, $weight_percentage, $id);
             $stmt->execute();
             $nrows = $stmt->affected_rows;
     
@@ -254,6 +271,7 @@ function updateRow($mysqli, $id) {
 
 function createNew($mysqli)
 {
+    
     $name          = $_GET['name'];
     $user_table_id = $_SESSION['user']['user_table_id'];
     $user_id       = $_SESSION['user']['username'];
@@ -292,14 +310,15 @@ function createNew($mysqli)
 		$teacher_id = $data[0][0]->id;
 		$student_id = $data[1][0]->id;
 		$subj_id = $data[2]->id;
+        $duration = $data[3];
+        $comment = $data[4];
 		
-		
-		$stmt      = $mysqli->prepare('INSERT INTO `activities` (`activities_id`, `duration`, `total_duration`, `active`, `teacher_id`, `subj_id`, `student_id`, `user_table_id`, `activity_group_id`) VALUES (NULL, 21, 12, "true", ?, ?, ?, ?, NULL);');
-		$stmt->bind_param("iiii",$teacher_id, $subj_id, $student_id,$user_table_id);
+		$stmt      = $mysqli->prepare('INSERT INTO `activities` (`activities_id`, `duration`, `total_duration`, `active`, `teacher_id`, `subj_id`, `student_id`, `user_table_id`, `activity_group_id`, comments) VALUES (NULL, ?, ?, "true", ?, ?, ?, ?, 0,?);');
+		$stmt->bind_param("iiiiiis",$duration, $duration,$teacher_id, $subj_id, $student_id,$user_table_id, $comment);
 		$stmt->execute();
     } else if ($_GET['query'] == 'space_constraints') {
         $data = json_decode($_GET['data']);
-        $weight_percentage = '100';
+        $weight_percentage = $_GET['weight'];
         $trueFalse = 'true';
         $str = '';
         $num = count($data);
@@ -331,8 +350,90 @@ function createNew($mysqli)
         }
 
         return '{"success":"true"}';
-
+    } else if ($_GET['query'] == 'basic') {
+        $data = $_GET['data'];
+        $table = $_GET['table'];
+        $num=0;
         
+        if ($table == 'days') {
+            //return $data . " days!";
+            $mysqli->query("DELETE FROM days WHERE user_table_id = $user_table_id");
+
+            //if ($data == 2) {
+                $mysqli->query("INSERT INTO days (day_name, user_table_id) VALUES ('Monday',  $user_table_id)");
+                $mysqli->query("INSERT INTO days (day_name, user_table_id) VALUES ('Tuesday',  $user_table_id)");
+                $num++;
+                $num++;
+                
+            //} 
+            if ($data >= 3) {
+                $mysqli->query("INSERT INTO days (day_name, user_table_id) VALUES ('Wednesday',  $user_table_id)");
+                $num++;
+            } 
+            if ($data >= 4) {
+                $mysqli->query("INSERT INTO days (day_name, user_table_id) VALUES ('Thursday',  $user_table_id)");
+                $num++;
+            } 
+            if ($data >= 5) {
+                $mysqli->query("INSERT INTO days (day_name, user_table_id) VALUES ('Friday',  $user_table_id)");
+                $num++;
+            } 
+            if ($data >= 6) {
+                $mysqli->query("INSERT INTO days (day_name, user_table_id) VALUES ('Saturday',  $user_table_id)");
+                $num++;
+            } 
+
+        } else if($table == 'hours') {
+            $mysqli->query("DELETE FROM hours WHERE user_table_id = $user_table_id");
+
+            $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('8:30', $user_table_id)");
+            $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('9:30', $user_table_id)");
+            $num++;
+            $num++;
+
+            if ($data >= 3) {
+                $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('10:30', $user_table_id)");
+                $num++;
+            }
+            if ($data >= 4) {
+                $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('11:30', $user_table_id)");
+                $num++;
+            }
+            if ($data >= 5) {
+                $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('12:30', $user_table_id)");
+                $num++;
+            }
+            if ($data >= 6) {
+                $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('13:30', $user_table_id)");
+                $num++;
+            }
+            if ($data >= 7) {
+                $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('14:30', $user_table_id)");
+                $num++;
+            }
+            if ($data >= 8) {
+                $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('15:30', $user_table_id)");
+                $num++;
+            }
+            if ($data >= 9) {
+                $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('16:30', $user_table_id)");
+                $num++;
+            }
+            if ($data >= 10) {
+                $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('17:30', $user_table_id)");
+                $num++;
+            }
+            if ($data >= 11) {
+                $mysqli->query("INSERT INTO hours (hour_name, user_table_id) VALUES ('18:30', $user_table_id)");
+                $num++;
+            }
+        }
+        $r = array(
+            'table' => $table, 
+            'count' => $num
+        );
+
+        return json_encode($r);
     }
     
     $nrows = $mysqli->insert_id;

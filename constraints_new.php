@@ -34,42 +34,61 @@
 				<div class="tab_container">
 					<!-- ================= TAB 1 ========================= -->
 					<div id="tab1" class="tab_content" ng-controller="TimeConsCTRL">
-						<div style="clear: both">
-							Activities constraints<br>
-							<div style="width: 160px; float: left">
-								<select size="10" style="min-width: 150px;" 
-									ng-model="activity" 
-									ng-options="(a.id + ' - ' + a.teach_name + ' - ' + a.subj_name) for a in activities" 
-									ng-dblclick="addToChosen(activity)">
-								</select>
-							</div>
-							<div style="width: 55px; float: left">
-							<button ng-click="addToChosen(activity)" >&nbsp;>&nbsp;>&nbsp;</button>
-							<button ng-click="removeFromChosen(chosenAct)">&nbsp;<&nbsp;<&nbsp;</button>
-							<button ng-click="clearChosen()" >clear</button>
-							</div>
-							<div style="width: 175px; float: left">
-					            <select size="10" 
-					            	ng-model="chosenAct" 
-					            	ng-options="(a.id + ' - ' + a.teach_name + ' - ' + a.subj_name) for a in  chosenActivities" style="min-width: 150px;" 
-					            	ng-dblclick="removeFromChosen(chosenAct)">
-					            </select>
-					        </div>
-				            <button ng-click="saveChosen()" >{{btn1}}</button><br>
-				            <span ng-show="checked">
-				                <button ng-click="destroy()" >{{btn2}}</button><br>
-				                <button ng-click="cancel()" >{{btn3}}</button>
-				            </span>
-				    	</div>
-				        <div style="clear: both; padding-top:20px;">
-				            <ul class="unstyled">
-				                <li ng-repeat="con in constraints">
-				                    Activities same starting time, WP:{{con.weight}}%, NA:{{con.num}} ID:{{con.id}}
-				                    <a href ng-click="editCons(con.id)">edit</a>
-				                </li>
-				            </ul>
-				        </div>
-				    </div>
+											<div style="position: relative; width: 100%;">
+										<span style="position: absolute; top: 0; right: 0; width: 100px; text-align:right;">
+											<a href="#" onclick="showHide('hidden_div'); return false;">Help</a>
+										</span>
+									</div>
+										<div id="hidden_div" style="display: none; padding-bottom: 30px; background-color:LightGrey;">
+										  Hidden Text is here!!!!! <<<<<<<<<<<<< your input here
+										</div>
+
+											<div style="clear: both">
+												Activities constraints<br>
+												<div style="width: 160px; float: left">
+													<select size="10" style="min-width: 150px;" 
+														ng-model="activity" 
+														ng-options="(a.id + ' - ' + a.teach_name + ' - ' + a.subj_name) for a in activities" 
+														ng-dblclick="addToChosen(activity)">
+													</select>
+												</div>
+												<div style="width: 55px; float: left">
+												<button ng-click="addToChosen(activity)" >&nbsp;>&nbsp;>&nbsp;</button>
+												<button ng-click="removeFromChosen(chosenAct)">&nbsp;<&nbsp;<&nbsp;</button>
+												<button ng-click="clearChosen()" >clear</button>
+												</div>
+												<div style="width: 175px; float: left">
+										            <select size="10" 
+										            	ng-model="chosenAct" 
+										            	ng-options="(a.id + ' - ' + a.teach_name + ' - ' + a.subj_name) for a in  chosenActivities" style="min-width: 150px;" 
+										            	ng-dblclick="removeFromChosen(chosenAct)">
+										            </select>
+										        </div>
+
+									    	</div>
+									    	<div style="clear: both; padding-top:5px;">
+									    		Weight percentage (recommended: 0.0% - 100%)<br>
+									    		<input ng-model="weight" name="input" value="100">  <br>  
+									    		<button ng-click="saveChosen()" >{{btn1}}</button>
+									            <span ng-show="checked">
+									                <button ng-click="destroy()" >{{btn2}}</button>
+									                <button ng-click="cancel()" >{{btn3}}</button>
+									            </span>
+									    	</div>
+									    	<hr>
+									        <div class="list-style">
+									        	 	<h2>All time constraints</h2>
+										           <ul>
+										                <li ng-repeat="con in constraints">
+										                    Constraint ID: {{con.id}}, weight: {{con.weight}}%, number of activities: {{con.num}}
+										                    <span>
+										                    	<a href ng-click="editCons(con.id, con.weight)">edit</a>
+										                	</span>
+										                </li>
+										            </ul>
+
+									        </div>
+									    </div>
 				    <!-- =================== TAB 2 ======================= -->
 				    <div id="tab2" class="tab_content" ng-controller="SubjectsCtrl">
 				        Time constraints

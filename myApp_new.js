@@ -1,3 +1,12 @@
+ function showHide(obj) {
+   var div = document.getElementById(obj);
+   if (div.style.display == 'none') {
+     div.style.display = '';
+   }
+   else {
+     div.style.display = 'none';
+   }
+ }
 
 $(document).ready(function() {
  
@@ -64,9 +73,49 @@ app.controller("AppController", function( $scope, myHttp ) {
 	$scope.getSubjects();
 	$scope.getStudents();
 });
-//////////////////////////////
-//		TIME constraint		//
-//////////////////////////////
+app.controller('DaysCtrl', function( $scope, myHttp ) {
+	$scope.addItem = function(data, table) {
+		//console.log(data + " " + table);
+		myHttp.query({
+            'query': 'basic',
+            'method': 'new',
+            'data':data,
+            'table':table
+        }).success(function(data) {
+           	if (data.table === 'hours') {
+           		console.log('looks like hours ' + data.count);
+           		$scope.total_hours = data.count;
+           	}; 
+           	if(data.table === 'days') {
+           		console.log('looks like days ' + data.count);
+           		$scope.total_days = data.count;
+           	};
+        });
+	}
+
+	$scope.getDays = function() {
+		myHttp.query({
+            'query': 'basic',
+            'method': 'get-all',
+            'table':'days'
+        }).success(function (data) {
+           $scope.total_days = data;
+        });
+	}
+	$scope.getHours = function() {
+		myHttp.query({
+            'query': 'basic',
+            'method': 'get-all',
+            'table':'hours'
+        }).success(function (data) {
+           $scope.total_hours = data;
+        });
+	}
+	$scope.getDays();
+	$scope.getHours();
+
+});
+
 app.controller('TimeConsCTRL', function( $scope, myHttp ) {
 	console.log("TimeConsCTRL");
 	$scope.activities = [];
@@ -95,12 +144,13 @@ app.controller('TimeConsCTRL', function( $scope, myHttp ) {
     }
     $scope.cancel = function () {
     	$scope.btn1 = 'Save';
+    	$scope.weight = '';
     	$scope.checked = false;
         $scope.clearChosen();
     }
 
 
-    $scope.editCons = function(id) {
+    $scope.editCons = function(id, weight) {
     	console.log(id);
     	$scope.btn1 = 'Update';
     	$scope.checked = true;
@@ -113,6 +163,7 @@ app.controller('TimeConsCTRL', function( $scope, myHttp ) {
         }).success(function(data) {
             $scope.chosenActivities = data;
             $scope.chosenAct = $scope.chosenActivities[0];
+            $scope.weight = weight;
         });
     }
 	
@@ -151,7 +202,8 @@ app.controller('TimeConsCTRL', function( $scope, myHttp ) {
 	            'query': 'space_constraints',
 	            'method': 'update',
 	            'data':$scope.chosenActivities,
-	            'id': $scope.tmp_id 
+	            'id': $scope.tmp_id,
+	            'weight': $scope.weight
 	        }).success(function(data) {
 	            $scope.getCons();
 	            $scope.cancel();
@@ -163,9 +215,10 @@ app.controller('TimeConsCTRL', function( $scope, myHttp ) {
 			myHttp.query({
 	            'query': 'space_constraints',
 	            'method': 'new',
-	            'data':$scope.chosenActivities
+	            'data':$scope.chosenActivities,
+	            'weight': $scope.weight
 	        }).success(function (data) {
-	            
+	            $scope.cancel();
 	            $scope.getCons();
 	        });
     	}
@@ -336,6 +389,8 @@ app.controller('ActivitiesCtrl', function( $scope, myHttp ) {
 				$scope.chosenTeachers.push({name:$scope.activities[i].teach_name, id:$scope.activities[i].teacher_id});
 				$scope.chosenS = $scope.chosenStudents[0];
 				$scope.chosenT = $scope.chosenTeachers[0];
+				$scope.duration = $scope.activities[i].duration;
+				$scope.comment = $scope.activities[i].comment;
 				console.log($scope.chosenStudents);
 				for (var j = $scope.subjects.length - 1; j >= 0; j--) {
 					if($scope.subjects[j].name == $scope.activities[i].subj_name) {
@@ -362,6 +417,8 @@ app.controller('ActivitiesCtrl', function( $scope, myHttp ) {
 		$scope.chosenTeachers = [];
 		$scope.button_value = 'Save';
 		$scope.checked = false;
+		$scope.duration = '';
+		$scope.comment = '';
 
 	}
 	
@@ -375,6 +432,8 @@ app.controller('ActivitiesCtrl', function( $scope, myHttp ) {
 				$scope.getActivities();
 				$scope.button_value = 'Save';
 				$scope.checked = false;
+				$scope.duration = '';
+				$scope.comment = '';
 			});
 		
 	}
@@ -383,7 +442,9 @@ app.controller('ActivitiesCtrl', function( $scope, myHttp ) {
 		var data = [
 			$scope.chosenTeachers,
 			$scope.chosenStudents,
-			$scope.subject
+			$scope.subject,
+			$scope.duration,
+			$scope.comment
 		];	
 		
 		if($scope.button_value == 'Update'){
@@ -392,7 +453,7 @@ app.controller('ActivitiesCtrl', function( $scope, myHttp ) {
             'query'	: 'activities',
             'method': 'update',
             'data'	: data,
-			'id':$scope.tmp_id
+			'id': $scope.tmp_id
 			})
 			.success(function (result) {
 				$scope.getActivities();
@@ -413,6 +474,8 @@ app.controller('ActivitiesCtrl', function( $scope, myHttp ) {
 		}
 		
 		$scope.chosenS = '';
+		$scope.duration = '';
+		$scope.comment = '';
 		$scope.chosenT = '';
 		$scope.chosenStudents = [];
 		$scope.chosenTeachers = [];
