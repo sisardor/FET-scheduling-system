@@ -1,0 +1,259 @@
+/*Below Created by Stephanie*/
+html{
+	background: linear-gradient(right bottom, #479EB8 29%, #3BF8FF 62%, #83C7C7 81%) no-repeat center center fixed;
+	background: -o-linear-gradient(right bottom, #479EB8 29%, #3BF8FF 62%, #83C7C7 81%) no-repeat center center fixed;
+	background: -moz-linear-gradient(right bottom, #479EB8 29%, #3BF8FF 62%, #83C7C7 81%) no-repeat center center fixed;
+	background: -webkit-linear-gradient(right bottom, #479EB8 29%, #3BF8FF 62%, #83C7C7 81%) no-repeat center center fixed;
+	background: -ms-linear-gradient(right bottom, #479EB8 29%, #3BF8FF 62%, #83C7C7 81%) no-repeat center center fixed;
+
+background-image: -webkit-gradient(	
+	linear,
+	right bottom,
+	left top,
+	color-stop(0.29, #479EB8),
+	color-stop(0.62, #3BF8FF),
+	color-stop(0.81, #83C7C7)
+);
+
+ -webkit-background-size: cover;
+ -moz-background-size: cover;
+ -o-background-size: cover;
+ background-size: cover;
+}
+
+
+body{
+	margin: 0; 
+	padding: 0;
+
+
+}
+
+header h1{
+	font-size: 3em;
+	text-align: center;
+	color: #FFFFFF;
+	text-shadow: 2px 2px #000000;
+}
+
+#wrapper, #mainForm{
+	min-width: 1200px;
+	margin: 2em auto; 
+	width: 1200px;
+}
+
+fieldset {
+	border: 0.25em groove linear-gradient(bottom, #F5F5F5 29%, #ADADAD 100%, #CBD6D6 81%);
+	border: 0.25em groove  -o-linear-gradient(bottom, #F5F5F5 29%, #ADADAD 100%, #CBD6D6 81%);
+	border: 0.25em groove -moz-linear-gradient(bottom, #F5F5F5 29%, #ADADAD 100%, #CBD6D6 81%);
+	border: 0.25em groove -webkit-linear-gradient(bottom, #F5F5F5 29%, #ADADAD 100%, #CBD6D6 81%);
+	border: 0.25em groove -ms-linear-gradient(bottom, #F5F5F5 29%, #ADADAD 100%, #CBD6D6 81%);
+	border: -webkit-gradient(	
+		linear,
+		left bottom,
+		left top,
+		color-stop(0.29, #F5F5F5),
+		color-stop(1, #ADADAD),
+		color-stop(0.81, #CBD6D6)
+	);
+	border-radius: 20px;
+	padding: 0em 1em 1em;
+	background-image: linear-gradient(bottom, #F5F5F5 29%, #ADADAD 100%, #CBD6D6 81%);
+	background-image: -o-linear-gradient(bottom, #F5F5F5 29%, #ADADAD 100%, #CBD6D6 81%);
+	background-image: -moz-linear-gradient(bottom, #F5F5F5 29%, #ADADAD 100%, #CBD6D6 81%);
+	background-image: -webkit-linear-gradient(bottom, #F5F5F5 29%, #ADADAD 100%, #CBD6D6 81%);
+	background-image: -ms-linear-gradient(bottom, #F5F5F5 29%, #ADADAD 100%, #CBD6D6 81%);
+
+	background-image: -webkit-gradient(	
+		linear,
+		left bottom,
+		left top,
+		color-stop(0.29, #F5F5F5),
+		color-stop(1, #ADADAD),
+		color-stop(0.81, #CBD6D6)
+	);
+}
+
+legend {
+	padding: 0em 0.5em;
+	margin-bottom: 0.25em;
+	font-size: 2em;
+	font-weight: bolder;
+	color: #000000;
+	text-shadow: 2px 8px 6px rgba(0,0,0,0.2),
+                 0px -5px 35px rgba(255,255,255,0.3);
+}
+
+label{
+	float: left;
+	display: block;
+	width: 5em;
+	text-align: left;
+	font-size: 1.15em;
+	vertical-align: bottom;
+}
+
+#upload, #exist, #create{
+	width: 350px;
+	min-height: 275px;
+	border: 0.25em inset;	
+	padding-left: 0.35em;
+}
+
+#upload h1, #exist h1, #create h1{
+	text-decoration: underline;
+	margin-left: 0.25em;
+	margin-bottom: 1em;
+	text-align: center;
+	font-size: 1.5em
+}
+
+#upload input, #exist input, #create input{
+	margin: 0.75em 0em 0em 0em;
+}
+
+input +.buttons{
+	margin-top: 1.25em;
+}
+
+.buttons{
+	width: 125px;
+	height: 25px;
+	margin-top: 0.5em;
+}
+
+#upload{
+	float: left;
+	margin-left: 1em;
+}
+
+#exist{
+	float: left;
+	margin-left: 1.25em;
+}
+
+#create{
+	float: left;
+	margin-left: 1.25em;
+}
+
+#logout input{
+	margin-top: 1.5em;
+	margin-right: 1.5em;
+	float: right;
+}
+
+nav{
+	float: left;
+	margin-left: 2em;
+	margin-top: 1.75em;
+}
+
+nav a{
+	text-decoration: none;
+	display: block; 
+	height: 35px;
+	width: 250px;
+	line-height: 35px;
+	border: outset 0.15em #A9A9A9;
+	border-radius: 10px;
+	padding: 0.1em 0.25em;
+	text-align: center;
+	background-color: #F8F8FF;
+}
+
+nav a:hover{
+	text-decoration: underline;
+	border-style: inset;
+}
+
+nav ul{
+	list-style-type: none;
+}
+
+nav li{
+	font-size: 1.5em;
+	margin-bottom: 1em;
+}
+
+#box{ 
+	/*border: 0.25em inset;*/
+	float: right; 
+	width: 650px; 
+	margin-right: 3em;
+	margin-top: 0.25em;
+	margin-bottom: 1em;
+	padding-left: 0.5em;
+	padding-top: 0.5em;
+}
+
+/*Below Created By Sardor*/
+ul.tabs {
+ margin: 0;
+ padding: 0;
+ float: left;
+ list-style: none;
+ height: 32px; /*--Set height of tabs--*/
+ border-bottom: 1px solid #999;
+ border-left: 1px solid #999;
+ width: 100%;
+
+}
+
+ul.tabs li {
+ float: left;
+ margin: 0;
+ padding: 0;
+ height: 31px; /*--Subtract 1px from the height of the unordered list--*/
+ line-height: 31px; /*--Vertically aligns the text within the tab--*/
+ border: 1px solid #999;
+ border-left: none;
+ margin-bottom: -1px; /*--Pull the list item down 1px--*/
+ overflow: hidden;
+ position: relative;
+ background: #e0e0e0;
+}
+
+ul.tabs li a {
+ text-decoration: none;
+ color: #000;
+ display: block;
+ font-size: 1.2em;
+ padding: 0 20px;
+ border: 1px solid #fff; /*--Gives the bevel look with a 1px white border inside the list item--*/
+ outline: none;
+}
+
+ul.tabs li a:hover {
+ background: #ccc;
+}
+
+html ul.tabs li.active, html ul.tabs li.active a:hover  { /*--Makes sure that the active tab does not listen to the hover properties--*/
+ background: #fff;
+ border-bottom: 1px solid #fff; /*--Makes the active tab look like it's connected with its content--*/
+}
+/*Tab Content CSS*/
+
+.tab_container {
+ border: 1px solid #999;
+ border-top: none;
+ overflow: hidden;
+ clear: both;
+ float: left; width: 100%;
+ background: #fff;
+ min-height: 350px;
+}
+
+.tab_content {
+ padding: 20px;
+ font-size: 1.2em;
+}
+
+
+.subForm
+{
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 18px;
+  margin-left: 0px;
+}
