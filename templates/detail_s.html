@@ -1,0 +1,15 @@
+
+<form name="myForm">
+	<div class="" ng-class="">
+		Student Name: <input name="input" ng-model="item.year_name" required><br>
+		Student Amount: <input name="input" ng-model="item.num_students" required><br>
+		<span ng-show="" class="help-inline">Required</span>
+	</div>
+
+	<br>
+	<!-- <a href="#/" >Cancel</a> -->
+
+	<a href ng-click="cancel()">Cancel</a>
+	<button ng-click="save()" ng-disabled="isClean()" >Save</button>
+	<button ng-click="destroy()" ng-show="item.id" >Delete</button>
+</form>
