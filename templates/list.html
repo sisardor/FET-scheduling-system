@@ -1,0 +1,16 @@
+<div>
+		<span>{{remaining()}} of {{items.length}} remaining</span>
+		<ul class="unstyled">
+			<li ng-repeat="item in items">
+				<span class="done-{{todo.done}}">{{item.name}}</span>
+        <a href="#/{{  }}/edit/{{ item.id }}" >edit</a>
+
+        <!-- <button ng-click="editThis(item.id)">edit</button> -->
+			</li>
+		</ul>
+		<form ng-submit="addItem()">
+			<input type="text" ng-model="nameInput"  size="30" placeholder="add new todo here">
+			<input class="btn-primary" type="submit" value="add">
+		</form>
+		<div ng-include src="template.url"></div>
+  </div>
